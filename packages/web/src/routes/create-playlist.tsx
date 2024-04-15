@@ -1,16 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-// import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { zodValidator } from "@tanstack/zod-form-adapter";
 
 type Playlist = {
-	id: number;
 	name: string;
 	coverArt: string;
-	createdAt: string;
 };
 
 export const Route = createFileRoute("/create-playlist")({
@@ -26,35 +26,54 @@ function CreatePlaylist() {
 }
 
 function CreatePlaylistForm() {
-	const [playlists, setPlaylists] = useState<Playlist[]>([]);
-	const navigate = useNavigate();
+	const navigate = useNavigate({ from: "/new-expense" });
+	const queryClient = useQueryClient();
+	const mutation = useMutation({
+		mutationFn: async ({ data }: { data: Playlist }) => {
+			const res = await fetch(import.meta.env.VITE_APP_API_URL + "/playlists", {
+				method: "POST",
+				body: JSON.stringify({ playlist: data }),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (!res.ok) {
+				throw new Error("An error occurred while creating the playlist");
+			}
+			const json = await res.json();
+			return json.playlist;
+		},
+	});
+
 	const form = useForm({
 		defaultValues: {
 			name: "",
 			coverArt: "",
 		},
 		onSubmit: async ({ value }) => {
-			await new Promise((resolve) => setTimeout(resolve, 3000));
-			const res = await fetch(import.meta.env.VITE_APP_API_URL + "/playlists", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(value),
-			});
-			const json = await res.json();
-			if (!res.ok) {
-				throw new Error("Server Error");
-			}
-			// navigate({ to: "/" });
-			setPlaylists(json.playlists);
-			console.log(value);
+			const data = {
+				name: value.name,
+				coverArt: value.coverArt,
+			};
+			await mutation.mutateAsync({ data });
+			queryClient.invalidateQueries({ queryKey: ["getPlaylists"] });
+			navigate({ to: "/" });
 		},
+		validatorAdapter: zodValidator,
 	});
 
 	return (
 		<>
 			<div className="flex flex-col space-y-4">
+				{mutation.isError && (
+					<Alert>
+						<AlertCircle className="h-4 w-4" />
+						<AlertTitle>Error!</AlertTitle>
+						<AlertDescription>{mutation.error.message}</AlertDescription>
+					</Alert>
+				)}
+
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
@@ -105,27 +124,16 @@ function CreatePlaylistForm() {
 					<form.Subscribe
 						selector={(state) => [state.canSubmit, state.isSubmitting]}
 						children={([canSubmit, isSubmitting]) => (
-							<Button type="submit" className="mt-4" disabled={!canSubmit}>
+							<Button
+								type="submit"
+								className="mt-4"
+								disabled={!canSubmit || isSubmitting}
+							>
 								{isSubmitting ? "Submitting" : "Create New Playlist"}
 							</Button>
 						)}
-					/>
+					></form.Subscribe>
 				</form>
-			</div>
-			<div className="space-y-4">
-				{playlists.map((playlist: Playlist) => (
-					<div key={playlist.id} className="flex space-x-4">
-						<img
-							src={playlist.coverArt}
-							alt={playlist.name}
-							className="w-16 h-16 rounded-md"
-						/>
-						<div className="flex flex-col">
-							<h3>{playlist.name}</h3>
-							<p>{new Date(playlist.createdAt).toLocaleDateString()}</p>
-						</div>
-					</div>
-				))}
 			</div>
 		</>
 	);

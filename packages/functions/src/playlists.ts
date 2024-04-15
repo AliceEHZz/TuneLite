@@ -3,55 +3,47 @@ import { logger } from "hono/logger";
 import { handle } from "hono/aws-lambda";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import { playlists as playlistsTable } from "@tunelite/core/db/schema/playlists";
+import { db } from "@tunelite/core/db";
+import { eq, desc, count, and } from "drizzle-orm";
+
 const api = new Hono().basePath("/playlists");
 
 api.use(logger());
 
-const fakePlaylists = [
-	{
-		id: 1,
-		name: "Moon",
-		coverArt: "https://via.placeholder.com/150",
-		createdAt: new Date().toISOString(),
-	},
-	{
-		id: 2,
-		name: "Sleep",
-		coverArt: "https://via.placeholder.com/150",
-		createdAt: new Date().toISOString(),
-	},
-];
-
-const playlistSchema = z.object({
-	id: z.number().int().positive().min(1),
-	name: z.string().min(3).max(100),
-	coverArt: z.string(),
+api.get("/", async (c) => {
+	const playlists = await db
+		.select()
+		.from(playlistsTable)
+		.orderBy(desc(playlistsTable.createdAt));
+	return c.json({ playlists });
 });
 
-type Playlist = z.infer<typeof playlistSchema>;
+api.post("/", async (c) => {
+	const body = await c.req.json();
 
-const createPlaylistSchema = playlistSchema.omit({ id: true });
-
-api.get("/", (c) => {
-	return c.json({ playlists: fakePlaylists });
-});
-
-api.post("/", zValidator("json", createPlaylistSchema), async (c) => {
-	const playlist = await c.req.valid("json");
-	fakePlaylists.push({
-		...playlist,
-		id: fakePlaylists.length + 1,
-		createdAt: new Date().toISOString(),
-	});
-
+	const playlist = {
+		...body.playlist,
+		userId: "bob",
+	};
+	const newPlaylist = await db
+		.insert(playlistsTable)
+		.values(playlist)
+		.returning();
 	return c.json({
-		playlists: fakePlaylists,
+		playlist: newPlaylist,
 	});
 });
 
-api.get("/:id{[0-9]+}", (c) => {
+api.get("/:id{[0-9]+}", async (c) => {
 	const id = +c.req.param("id");
-	const playlist = fakePlaylists.find((p) => p.id === id);
+
+	const playlist = await db
+		.select()
+		.from(playlistsTable)
+		.where(and(eq(playlistsTable.id, id)))
+		.then((res) => res[0]);
+
 	return playlist ? c.json({ playlist }) : c.notFound();
 });
 
