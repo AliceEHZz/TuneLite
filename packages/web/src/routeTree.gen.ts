@@ -11,52 +11,63 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as CreatePlaylistImport } from './routes/create-playlist'
 import { Route as AboutImport } from './routes/about'
-import { Route as IndexImport } from './routes/index'
-import { Route as PlaylistIdImport } from './routes/playlist.$id'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedCreatePlaylistImport } from './routes/_authenticated/create-playlist'
+import { Route as AuthenticatedPlaylistIdImport } from './routes/_authenticated/playlist.$id'
 
 // Create/Update Routes
-
-const CreatePlaylistRoute = CreatePlaylistImport.update({
-  path: '/create-playlist',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const AboutRoute = AboutImport.update({
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  path: '/',
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PlaylistIdRoute = PlaylistIdImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
+  path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedCreatePlaylistRoute =
+  AuthenticatedCreatePlaylistImport.update({
+    path: '/create-playlist',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedPlaylistIdRoute = AuthenticatedPlaylistIdImport.update({
   path: '/playlist/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      preLoaderRoute: typeof IndexImport
+    '/_authenticated': {
+      preLoaderRoute: typeof AuthenticatedImport
       parentRoute: typeof rootRoute
     }
     '/about': {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/create-playlist': {
-      preLoaderRoute: typeof CreatePlaylistImport
-      parentRoute: typeof rootRoute
+    '/_authenticated/create-playlist': {
+      preLoaderRoute: typeof AuthenticatedCreatePlaylistImport
+      parentRoute: typeof AuthenticatedImport
     }
-    '/playlist/$id': {
-      preLoaderRoute: typeof PlaylistIdImport
-      parentRoute: typeof rootRoute
+    '/_authenticated/': {
+      preLoaderRoute: typeof AuthenticatedIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/playlist/$id': {
+      preLoaderRoute: typeof AuthenticatedPlaylistIdImport
+      parentRoute: typeof AuthenticatedImport
     }
   }
 }
@@ -64,10 +75,12 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  IndexRoute,
+  AuthenticatedRoute.addChildren([
+    AuthenticatedCreatePlaylistRoute,
+    AuthenticatedIndexRoute,
+    AuthenticatedPlaylistIdRoute,
+  ]),
   AboutRoute,
-  CreatePlaylistRoute,
-  PlaylistIdRoute,
 ])
 
 /* prettier-ignore-end */

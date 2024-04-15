@@ -9,6 +9,7 @@ type Playlist = {
 };
 
 export function PlaylistsFetcher() {
+	
 	async function getPlaylists() {
 		const res = await fetch(import.meta.env.VITE_APP_API_URL + "/playlists");
 
@@ -22,8 +23,6 @@ export function PlaylistsFetcher() {
 		queryKey: ["getPlaylists"],
 		queryFn: getPlaylists,
 	});
-
-	console.log(data);
 
 	return (
 		<>

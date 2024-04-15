@@ -13,7 +13,7 @@ type Playlist = {
 	coverArt: string;
 };
 
-export const Route = createFileRoute("/create-playlist")({
+export const Route = createFileRoute("/_authenticated/create-playlist")({
 	component: CreatePlaylist,
 });
 function CreatePlaylist() {
