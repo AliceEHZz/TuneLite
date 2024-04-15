@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { Button } from "./components/ui/button";
 
 type Playlist = {
 	id: number;
@@ -69,7 +70,7 @@ function App() {
 					value={newPlaylistCoverArt}
 					onChange={(e) => setNewPlaylistCoverArt(e.target.value)}
 				/>
-				<button type="submit">Add Playlist</button>
+				<Button type="submit">Add Playlist</Button>
 			</form>
 		</div>
 	);
