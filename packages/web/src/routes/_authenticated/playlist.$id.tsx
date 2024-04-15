@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { useDeletePlaylist } from "@/hooks/useDeletePlaylist";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/playlist/$id")({
 	component: PlaylistComponent,
@@ -35,7 +35,26 @@ function PlaylistComponent() {
 		queryFn: getPlaylist,
 	});
 
-	const { deletePlaylist, isDeletingPlaylist } = useDeletePlaylist();
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	const mutation = useMutation({
+		mutationFn: async (id: number) => {
+			await fetch(import.meta.env.VITE_APP_API_URL + "/playlists/" + id, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+		},
+	});
+
+	//handle deleteOnClick
+	const deletePlaylist = async (id: number) => {
+		await mutation.mutateAsync(id);
+		console.log("Playlist Deleted");
+		queryClient.invalidateQueries({ queryKey: ["getPlaylists"] });
+		navigate({ to: "/" });
+	};
 
 	return (
 		<>
@@ -58,9 +77,8 @@ function PlaylistComponent() {
 						<div>
 							<Button
 								type="submit"
-								disabled={isDeletingPlaylist}
 								className="text-destructive focus:bg-destructive/80 focus:text-white"
-								onClick={() => deletePlaylist(data.playlist.id)}
+								onClick={() => deletePlaylist(parseInt(data.playlist.id))}
 							>
 								Delete
 							</Button>

@@ -14,6 +14,7 @@ export function API({ stack }: StackContext) {
 			"GET /playlists": "packages/functions/src/playlists.handler",
 			"POST /playlists": "packages/functions/src/playlists.handler",
 			"GET /playlists/{id}": "packages/functions/src/playlists.handler",
+			"DELETE /playlists/{id}": "packages/functions/src/playlists.handler",
 		},
 	});
 

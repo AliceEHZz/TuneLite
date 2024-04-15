@@ -63,12 +63,11 @@ api.delete("/:id{[0-9]+}", async (c) => {
 
 	const deletedPlaylist = await db
 		.delete(playlistsTable)
-		.where(eq(playlistsTable.id, id))
-		.returning()
-		.then((res) => res[0]);
+		.where(eq(playlistsTable.id, playlist.id))
+		.returning();
 
 	if (!deletedPlaylist) {
-		return c.json({ error: "Application not found" }, 404);
+		return c.json({ error: "Delete Not Success" }, 404);
 	}
 
 	return c.json({ success: true });
