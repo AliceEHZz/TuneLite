@@ -1,8 +1,10 @@
-import { ApiHandler } from "sst/node/api";
+import { Hono } from "hono";
+import { handle } from "hono/aws-lambda";
 
-export const handler = ApiHandler(async (_evt) => {
-  return {
-    statusCode: 200,
-    body: `Hello world. The time is ${new Date().toISOString()}`,
-  };
+const app = new Hono();
+
+app.get("/", (c) => {
+	return c.json({ message: "Hello from root home!" });
 });
+
+export const handler = handle(app);
