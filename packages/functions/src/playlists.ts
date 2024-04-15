@@ -10,13 +10,13 @@ api.use(logger());
 const fakePlaylists = [
 	{
 		id: 1,
-		name: "Playlist 1",
+		name: "Moon",
 		coverArt: "https://via.placeholder.com/150",
 		createdAt: new Date().toISOString(),
 	},
 	{
 		id: 2,
-		name: "Playlist 2",
+		name: "Sleep",
 		coverArt: "https://via.placeholder.com/150",
 		createdAt: new Date().toISOString(),
 	},
