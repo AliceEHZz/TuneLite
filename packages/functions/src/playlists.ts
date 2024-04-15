@@ -50,15 +50,28 @@ api.get("/:id{[0-9]+}", async (c) => {
 // delete
 api.delete("/:id{[0-9]+}", async (c) => {
 	const id = +c.req.param("id");
+
 	const playlist = await db
 		.select()
 		.from(playlistsTable)
 		.where(eq(playlistsTable.id, id))
 		.then((res) => res[0]);
 
-	return c.json({
-		playlists: fakePlaylists,
-	});
+	if (!playlist) {
+		return c.json({ error: "Playlist not found" }, 404);
+	}
+
+	const deletedPlaylist = await db
+		.delete(playlistsTable)
+		.where(eq(playlistsTable.id, id))
+		.returning()
+		.then((res) => res[0]);
+
+	if (!deletedPlaylist) {
+		return c.json({ error: "Application not found" }, 404);
+	}
+
+	return c.json({ success: true });
 });
 
 export const handler = handle(api);

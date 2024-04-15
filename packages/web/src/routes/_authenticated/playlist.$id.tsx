@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { useDeletePlaylist } from "@/hooks/useDeletePlaylist";
+
 export const Route = createFileRoute("/_authenticated/playlist/$id")({
 	component: PlaylistComponent,
 });
@@ -15,6 +17,7 @@ type Playlist = {
 
 function PlaylistComponent() {
 	const id = Route.useParams().id;
+
 	async function getPlaylist() {
 		const res = await fetch(
 			import.meta.env.VITE_APP_API_URL + "/playlists/" + id
@@ -24,7 +27,6 @@ function PlaylistComponent() {
 		}
 
 		const playlist: Playlist = await res.json();
-		console.log(playlist);
 		return playlist;
 	}
 
@@ -32,6 +34,8 @@ function PlaylistComponent() {
 		queryKey: ["getPlaylist", id],
 		queryFn: getPlaylist,
 	});
+
+	const { deletePlaylist, isDeletingPlaylist } = useDeletePlaylist();
 
 	return (
 		<>
@@ -52,7 +56,14 @@ function PlaylistComponent() {
 							Created At: {data.playlist.createdAt}
 						</p>
 						<div>
-							<Button type="submit">Delete</Button>
+							<Button
+								type="submit"
+								disabled={isDeletingPlaylist}
+								className="text-destructive focus:bg-destructive/80 focus:text-white"
+								onClick={() => deletePlaylist(data.playlist.id)}
+							>
+								Delete
+							</Button>
 						</div>
 					</div>
 				</div>

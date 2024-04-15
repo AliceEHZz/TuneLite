@@ -26,7 +26,7 @@ function CreatePlaylist() {
 }
 
 function CreatePlaylistForm() {
-	const navigate = useNavigate({ from: "/new-expense" });
+	const navigate = useNavigate({ from: "/create-playlist" });
 	const queryClient = useQueryClient();
 	const mutation = useMutation({
 		mutationFn: async ({ data }: { data: Playlist }) => {
