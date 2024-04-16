@@ -14,7 +14,7 @@ export const playlists = pgTable(
 		id: serial("id").primaryKey().notNull(),
 		userId: text("user_id").notNull(),
 		name: varchar("name", { length: 256 }).notNull(),
-		coverArt: varchar("cover_art", { length: 256 }).notNull(),
+		image: text("image"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 	},
 	(table) => {

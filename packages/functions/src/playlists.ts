@@ -4,8 +4,10 @@ import { handle } from "hono/aws-lambda";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { playlists as playlistsTable } from "@tunelite/core/db/schema/playlists";
+import { songs as songsTable } from "@tunelite/core/db/schema/songs";
 import { db } from "@tunelite/core/db";
 import { eq, desc, count, and } from "drizzle-orm";
+import { authMiddleware } from "@tunelite/core/auth";
 
 const api = new Hono().basePath("/playlists");
 
@@ -19,12 +21,13 @@ api.get("/", async (c) => {
 	return c.json({ playlists });
 });
 
-api.post("/", async (c) => {
+api.post("/", authMiddleware, async (c) => {
+	const userId = c.var.userId;
 	const body = await c.req.json();
 
 	const playlist = {
 		...body.playlist,
-		userId: "bob",
+		userId,
 	};
 	const newPlaylist = await db
 		.insert(playlistsTable)
@@ -47,14 +50,51 @@ api.get("/:id{[0-9]+}", async (c) => {
 	return playlist ? c.json({ playlist }) : c.notFound();
 });
 
-// delete
-api.delete("/:id{[0-9]+}", async (c) => {
+// get songs for playlist
+api.get("/:id{[0-9]+}/songs", async (c) => {
+	const playlistId = +c.req.param("id");
+
+	const songs = await db
+		.select()
+		.from(songsTable)
+		.where(eq(songsTable.playlistId, playlistId))
+		.orderBy(desc(songsTable.addedAt));
+
+	return c.json({ songs });
+});
+
+//add songs to playlist
+api.post("/:id{[0-9]+}/songs", async (c) => {
+	const playlistId = +c.req.param("id");
+	const body = await c.req.json();
+
+	const song = {
+		...body.song,
+		playlistId,
+	};
+
+	const newSong = await db.insert(songsTable).values(song).returning();
+
+	// const songs = await db
+	// 	.select()
+	// 	.from(songsTable)
+	// 	.where(eq(songsTable.playlistId, playlistId))
+	// 	.orderBy(desc(songsTable.addedAt));
+
+	return c.json({
+		song: newSong,
+	});
+});
+
+// delete playlist
+api.delete("/:id{[0-9]+}", authMiddleware, async (c) => {
+	const userId = c.var.userId;
 	const id = +c.req.param("id");
 
 	const playlist = await db
 		.select()
 		.from(playlistsTable)
-		.where(eq(playlistsTable.id, id))
+		.where(and(eq(playlistsTable.userId, userId), eq(playlistsTable.id, id)))
 		.then((res) => res[0]);
 
 	if (!playlist) {
@@ -63,7 +103,7 @@ api.delete("/:id{[0-9]+}", async (c) => {
 
 	const deletedPlaylist = await db
 		.delete(playlistsTable)
-		.where(eq(playlistsTable.id, playlist.id))
+		.where(and(eq(playlistsTable.userId, userId), eq(playlistsTable.id, id)))
 		.returning();
 
 	if (!deletedPlaylist) {

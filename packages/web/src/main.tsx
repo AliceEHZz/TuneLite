@@ -19,6 +19,7 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
 		<KindeProvider
+			audience={import.meta.env.VITE_APP_KINDE_AUDIENCE}
 			clientId="f7e2a122767741419b08cef0de9f8ed8"
 			domain="https://tunelite.kinde.com"
 			logoutUri={window.location.origin}

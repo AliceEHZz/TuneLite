@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import { SongsFetcher } from "@/components/songs-fetcher";
+import { CreateSongForm } from "@/components/createSong";
 
 export const Route = createFileRoute("/_authenticated/playlist/$id")({
 	component: PlaylistComponent,
@@ -11,16 +14,34 @@ type Playlist = {
 	id: number;
 	userId: string;
 	name: string;
-	coverArt: string;
+	image: string;
 	createdAt: string;
+};
+
+type Song = {
+	id: number;
+	songName: string;
+	artist: string;
+	playlistId: number;
+	addedAt: string;
 };
 
 function PlaylistComponent() {
 	const id = Route.useParams().id;
-
+	const { getToken } = useKindeAuth();
 	async function getPlaylist() {
+		const token = await getToken();
+		if (!token) {
+			throw new Error("No token found");
+		}
+
 		const res = await fetch(
-			import.meta.env.VITE_APP_API_URL + "/playlists/" + id
+			import.meta.env.VITE_APP_API_URL + "/playlists/" + id,
+			{
+				headers: {
+					Authorization: token,
+				},
+			}
 		);
 		if (!res.ok) {
 			throw new Error("Something Went Wrong!");
@@ -35,25 +56,33 @@ function PlaylistComponent() {
 		queryFn: getPlaylist,
 	});
 
+	//handle deleteOnClick
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 	const mutation = useMutation({
 		mutationFn: async (id: number) => {
+			const token = await getToken();
+			if (!token) {
+				throw new Error("No token found");
+			}
 			await fetch(import.meta.env.VITE_APP_API_URL + "/playlists/" + id, {
 				method: "DELETE",
 				headers: {
+					Authorization: token,
 					"Content-Type": "application/json",
 				},
 			});
 		},
 	});
 
-	//handle deleteOnClick
 	const deletePlaylist = async (id: number) => {
 		await mutation.mutateAsync(id);
-		console.log("Playlist Deleted");
 		queryClient.invalidateQueries({ queryKey: ["getPlaylists"] });
 		navigate({ to: "/" });
+	};
+
+	const formatDate = (date: string) => {
+		return date.toString().split("T")[0];
 	};
 
 	return (
@@ -61,32 +90,38 @@ function PlaylistComponent() {
 			{error ? (
 				<div className="text-red-400">{`An error has occurred: ${error.message}`}</div>
 			) : data ? (
-				<div>
+				<div className="flex flex-col space-y-4">
 					<div className="max-w-lg mx-auto p-4 bg-gray-800 shadow-md rounded-md text-white">
-						<h1 className="text-2xl font-bold mb-4">{data.playlist.name}</h1>
+						<h1 className="text-3xl font-bold mb-4">{data.playlist.name}</h1>{" "}
 						<div className="relative h-64 mb-4">
 							<img
-								src={data.playlist.coverArt}
+								src={data.playlist.image}
 								alt="Playlist Cover Art"
 								className="object-cover w-full h-full rounded-md"
 							/>
 						</div>
-						<p className="text-gray-400">
-							Created At: {data.playlist.createdAt}
-						</p>
-						<div>
+						<div className="my-2 text-right flex flex-row justify-between">
+							<p className="mb-4">
+								Created at: {formatDate(data.playlist.createdAt)}
+							</p>
 							<Button
 								type="submit"
 								className="text-destructive focus:bg-destructive/80 focus:text-white"
-								onClick={() => deletePlaylist(parseInt(data.playlist.id))}
+								onClick={() => deletePlaylist(parseInt(id))}
 							>
 								Delete
 							</Button>
 						</div>
 					</div>
+					<div className="mt-10">
+						<CreateSongForm playlistId={parseInt(id)} />
+					</div>
+					<div className="mt-10">
+						<SongsFetcher playlistId={parseInt(id)} playlistName={data.name} />
+					</div>
 				</div>
 			) : isPending ? (
-				<p className="text-gray-400">Loading...</p>
+				<p className="text-gray-400">Loading Playlist...</p>
 			) : null}
 		</>
 	);
