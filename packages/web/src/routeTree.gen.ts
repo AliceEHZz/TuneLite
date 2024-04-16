@@ -13,7 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AboutImport } from './routes/about'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as IndexImport } from './routes/index'
+import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedCreatePlaylistImport } from './routes/_authenticated/create-playlist'
 import { Route as AuthenticatedPlaylistIdImport } from './routes/_authenticated/playlist.$id'
 
@@ -29,8 +30,13 @@ const AuthenticatedRoute = AuthenticatedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
+const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
+  path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -49,6 +55,10 @@ const AuthenticatedPlaylistIdRoute = AuthenticatedPlaylistIdImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_authenticated': {
       preLoaderRoute: typeof AuthenticatedImport
       parentRoute: typeof rootRoute
@@ -61,8 +71,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreatePlaylistImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/': {
-      preLoaderRoute: typeof AuthenticatedIndexImport
+    '/_authenticated/profile': {
+      preLoaderRoute: typeof AuthenticatedProfileImport
       parentRoute: typeof AuthenticatedImport
     }
     '/_authenticated/playlist/$id': {
@@ -75,9 +85,10 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
+  IndexRoute,
   AuthenticatedRoute.addChildren([
     AuthenticatedCreatePlaylistRoute,
-    AuthenticatedIndexRoute,
+    AuthenticatedProfileRoute,
     AuthenticatedPlaylistIdRoute,
   ]),
   AboutRoute,
