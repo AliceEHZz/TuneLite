@@ -4,12 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 type Playlist = {
 	id: number;
 	name: string;
-	coverArt: string;
+	image: string;
 	createdAt: string;
 };
 
 export function PlaylistsFetcher() {
-	
 	async function getPlaylists() {
 		const res = await fetch(import.meta.env.VITE_APP_API_URL + "/playlists");
 
