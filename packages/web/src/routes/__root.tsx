@@ -7,11 +7,12 @@ export const Route = createRootRoute({
 	component: () => (
 		<>
 			<div className="grid max-h-dvh w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+				{/* Left nav panel */}
 				<div className="hidden border-r bg-muted/40 md:block">
 					<div className="flex h-dvh max-h-dvh flex-col gap-2">
-						<div className="flex h-14 items-center px-4 lg:h-[60px] lg:px-6">
-							<div className="flex items-center gap-2 text-2xl font-bold">
-								<AudioLines className="h-30 w-30" />
+						<div className="flex h-14 items-center px-6 lg:h-[60px] lg:px-6 mt-6">
+							<div className="flex flex-row space-x-6 items-center gap-2 text-2xl font-bold my-6">
+								<AudioLines className="h-12 w-12" />
 								<span>TuneLite</span>
 							</div>
 						</div>
@@ -27,14 +28,15 @@ export const Route = createRootRoute({
 									to="/create-playlist"
 									className="flex items-center gap-2=3 px-3 py-2 text-lg font-bold text-muted-foreground transition-all hover:text-primary data-[status=active]:text-primary"
 								>
-									Create
+									Create Playlist
 								</Link>
 								<Link
-									to="/about"
+									to="/profile"
 									className="flex items-center gap-2=3 px-3 py-2 text-lg font-bold text-muted-foreground transition-all hover:text-primary data-[status=active]:text-primary"
 								>
-									About
+									Profile
 								</Link>
+
 								<div className="mt-10">
 									<Separator />
 								</div>
@@ -50,6 +52,7 @@ export const Route = createRootRoute({
 						</div>
 					</div>
 				</div>
+				{/* Right content panel */}
 				<div className="flex flex-col p-20">
 					<Outlet />
 				</div>
