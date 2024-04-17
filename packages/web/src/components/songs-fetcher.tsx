@@ -120,14 +120,14 @@ export function SongsFetcher({
 							</TableRow>
 						) : (
 							data.songs.map((song) => (
-								<TableRow key={song.id}>
+								<TableRow key={song.id} className="text-lg">
 									<TableCell className="text-left">{song.songName}</TableCell>
 									<TableCell>{song.artist}</TableCell>
 									<TableCell>{song.addedAt.split("T")[0]}</TableCell>
 									<TableCell className="text-right">
 										<Button
 											type="submit"
-											className="hover:bg-red-600 hover:text-primary focus:bg-destructive focus:text-primary"
+											className="hover:bg-red-600 hover:text-primary focus:bg-destructive focus:text-primarytext-lg"
 											onClick={() => deleteSong(song.id)}
 										>
 											Delete
