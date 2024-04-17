@@ -10,13 +10,13 @@ export const Route = createFileRoute("/_authenticated/playlist/$id")({
 	component: PlaylistComponent,
 });
 
-type Playlist = {
-	id: number;
-	userId: string;
-	name: string;
-	image: string;
-	createdAt: string;
-};
+// type Playlist = {
+// 	id: number;
+// 	userId: string;
+// 	name: string;
+// 	image: string;
+// 	createdAt: string;
+// };
 
 function PlaylistComponent() {
 	const id = Route.useParams().id;
