@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { SongsFetcher } from "@/components/songs-fetcher";
 import { CreateSongForm } from "@/components/createSong";
@@ -39,7 +39,7 @@ function PlaylistComponent() {
 			throw new Error("Something Went Wrong!");
 		}
 
-		const playlist: Playlist = await res.json();
+		const playlist = await res.json();
 		return playlist;
 	}
 
@@ -79,11 +79,11 @@ function PlaylistComponent() {
 					</div>
 					<Separator className="mt-10" />
 					<div className="mt-10 w-full">
-						<SongsFetcher playlistId={parseInt(id)} playlistName={data.name} />
+						<SongsFetcher playlistId={parseInt(id)} />
 					</div>
 				</div>
 			) : isPending ? (
-				<p className="text-gray-400">Loading Playlist...</p>
+				<p className="text-gray-400">Loading Playlist Content...</p>
 			) : null}
 		</>
 	);

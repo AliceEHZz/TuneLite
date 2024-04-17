@@ -25,17 +25,19 @@ export function PlaylistsFetcher() {
 
 	return (
 		<>
-			{error
-				? "An error has occurred: " + error.message
-				: data?.playlists.map((playlist: Playlist) => (
-						<Link
-							key={playlist.id}
-							to={`/playlist/${playlist.id}` as string}
-							className="flex items-center gap-2=3 px-5 py-2 text-md font-bold text-muted-foreground transition-all hover:text-primary data-[status=active]:text-primary"
-						>
-							{playlist.name}
-						</Link>
-					))}
+			{isPending
+				? "Loading playlists"
+				: error
+					? "An error has occurred: " + error.message
+					: data?.playlists.map((playlist: Playlist) => (
+							<Link
+								key={playlist.id}
+								to={`/playlist/${playlist.id}` as string}
+								className="flex items-center gap-2=3 px-5 py-2 text-md font-bold text-muted-foreground transition-all hover:text-primary data-[status=active]:text-primary"
+							>
+								{playlist.name}
+							</Link>
+						))}
 		</>
 	);
 }
