@@ -75,12 +75,6 @@ api.post("/:id{[0-9]+}/songs", async (c) => {
 
 	const newSong = await db.insert(songsTable).values(song).returning();
 
-	// const songs = await db
-	// 	.select()
-	// 	.from(songsTable)
-	// 	.where(eq(songsTable.playlistId, playlistId))
-	// 	.orderBy(desc(songsTable.addedAt));
-
 	return c.json({
 		song: newSong,
 	});
@@ -107,7 +101,38 @@ api.delete("/:id{[0-9]+}", authMiddleware, async (c) => {
 		.returning();
 
 	if (!deletedPlaylist) {
-		return c.json({ error: "Delete Not Success" }, 404);
+		return c.json({ error: "Delete Playlist Not Success" }, 404);
+	}
+
+	return c.json({ success: true });
+});
+
+// delete song from playlist
+api.delete("/:id{[0-9]+}/songs/:songId{[0-9]+}", async (c) => {
+	const playlistId = +c.req.param("id");
+	const songId = +c.req.param("songId");
+
+	const song = await db
+		.select()
+		.from(songsTable)
+		.where(
+			and(eq(songsTable.playlistId, playlistId), eq(songsTable.id, songId))
+		)
+		.then((res) => res[0]);
+
+	if (!song) {
+		return c.json({ error: "Song not found" }, 404);
+	}
+
+	const deletedSong = await db
+		.delete(songsTable)
+		.where(
+			and(eq(songsTable.playlistId, playlistId), eq(songsTable.id, songId))
+		)
+		.returning();
+
+	if (!deletedSong) {
+		return c.json({ error: "Delete Song Not Success" }, 404);
 	}
 
 	return c.json({ success: true });

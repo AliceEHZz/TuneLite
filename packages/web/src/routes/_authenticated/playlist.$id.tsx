@@ -18,14 +18,6 @@ type Playlist = {
 	createdAt: string;
 };
 
-type Song = {
-	id: number;
-	songName: string;
-	artist: string;
-	playlistId: number;
-	addedAt: string;
-};
-
 function PlaylistComponent() {
 	const id = Route.useParams().id;
 	const { getToken } = useKindeAuth();
@@ -106,7 +98,7 @@ function PlaylistComponent() {
 							</p>
 							<Button
 								type="submit"
-								className="text-destructive focus:bg-destructive/80 focus:text-white"
+								className="focus:bg-destructive/80 focus:text-white"
 								onClick={() => deletePlaylist(parseInt(id))}
 							>
 								Delete

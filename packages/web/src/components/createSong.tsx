@@ -44,7 +44,6 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 				throw new Error("An error occurred while adding the song");
 			}
 			const json = await res.json();
-			console.log("newsong: ", json.song);
 			return json.song;
 		},
 	});

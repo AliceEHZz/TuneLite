@@ -29,7 +29,7 @@ function CreatePlaylist() {
 
 function CreatePlaylistForm() {
 	const { getToken } = useKindeAuth();
-	const navigate = useNavigate({ from: "/create-playlist" });
+	const navigate = useNavigate();
 	const [filePreviewURL, setFilePreviewURL] = useState<string | undefined>();
 
 	const computeSHA256 = async (file: File) => {
@@ -163,7 +163,11 @@ function CreatePlaylistForm() {
 								<Label>
 									Cover Art
 									{filePreviewURL && (
-										<img className="max-w-xs m-auto" src={filePreviewURL} />
+										<img
+											className="max-w-xs m-auto"
+											src={filePreviewURL}
+											alt="uploaded image preview"
+										/>
 									)}
 									<Input
 										type="file"

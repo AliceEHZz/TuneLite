@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "./ui/button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import {
 	Table,
 	TableBody,
-	TableCaption,
 	TableCell,
 	TableHead,
 	TableHeader,
@@ -22,10 +22,10 @@ type Song = {
 
 export function SongsFetcher({
 	playlistId,
-	playlistName,
+	// playlistName,
 }: {
 	playlistId: number;
-	playlistName: string;
+	// playlistName: string;
 }) {
 	const { getToken } = useKindeAuth();
 	// get songs for playlist
@@ -54,6 +54,38 @@ export function SongsFetcher({
 		queryKey: ["getSongsForPlaylist", playlistId],
 		queryFn: getSongsForPlaylist,
 	});
+
+	// handle delete song
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	const mutation = useMutation({
+		mutationFn: async (songId: number) => {
+			const token = await getToken();
+			if (!token) {
+				throw new Error("No token found");
+			}
+			await fetch(
+				import.meta.env.VITE_APP_API_URL +
+					"/playlists/" +
+					playlistId +
+					"/songs/" +
+					songId,
+				{
+					method: "DELETE",
+					headers: {
+						Authorization: token,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+		},
+	});
+
+	const deleteSong = async (songId: number) => {
+		await mutation.mutateAsync(songId);
+		queryClient.invalidateQueries({ queryKey: ["getSongsForPlaylist"] });
+		navigate({ to: "/playlist/" + playlistId });
+	};
 
 	return (
 		<>
@@ -92,7 +124,15 @@ export function SongsFetcher({
 									<TableCell className="text-left">{song.songName}</TableCell>
 									<TableCell>{song.artist}</TableCell>
 									<TableCell>{song.addedAt.split("T")[0]}</TableCell>
-									<TableCell className="text-right">delete</TableCell>
+									<TableCell className="text-right">
+										<Button
+											type="submit"
+											className="focus:bg-destructive/80 focus:text-white"
+											onClick={() => deleteSong(song.id)}
+										>
+											Delete
+										</Button>
+									</TableCell>
 								</TableRow>
 							))
 						)}
