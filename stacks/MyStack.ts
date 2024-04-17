@@ -50,6 +50,13 @@ export function API({ stack }: StackContext) {
 					handler: "packages/functions/src/s3.handler",
 				},
 			},
+			"GET /csharp": {
+				authorizer: "none",
+				function: {
+					handler: "packages/csharp/ApiDotnet",
+					runtime: "container",
+				},
+			},
 		},
 	});
 
