@@ -18,10 +18,10 @@ function AboutPage() {
 			</div>
 			<p className="text-lg mb-4">
 				TuneLite is a minimal playlist app. The current stage allows users to
-				create and delete playlists after logging in.
+				create playlists and add songs to the playlists after logging in.
 			</p>
 			<h3 className="text-2xl">Future releases</h3>
-			<p>Future releases will include adding songs to a single playlist.</p>
+			<p>Future releases will include a music player for the songs. </p>
 		</div>
 	);
 }

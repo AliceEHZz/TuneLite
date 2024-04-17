@@ -67,7 +67,7 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 	return (
 		<>
 			<div className="mx-auto w-full">
-				<h1 className="mb-4 text-2xl font-bold">Add Song to Playlist</h1>
+				<h1 className="mb-4 text-xl font-bold">Add New Song to Playlist</h1>
 				<div className="flex flex-row justify-between space-x-10">
 					{mutation.isError && (
 						<Alert>

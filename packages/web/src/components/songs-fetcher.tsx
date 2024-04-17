@@ -89,14 +89,14 @@ export function SongsFetcher({
 
 	return (
 		<>
-			<h1>List of Songs</h1>
+			<h1 className="text-xl font-semibold">List of Songs</h1>
 			{error ? (
 				"An error has occurred when fetching songs: " + error.message
 			) : (
 				<Table>
 					<TableHeader>
 						<TableRow className="font-semibold">
-							<TableHead className="w-[100px]">Song</TableHead>
+							<TableHead className="w-[300px]">Song</TableHead>
 							<TableHead>Artist</TableHead>
 							<TableHead>Added Date</TableHead>
 							<TableHead className="text-right">Action</TableHead>
@@ -127,7 +127,7 @@ export function SongsFetcher({
 									<TableCell className="text-right">
 										<Button
 											type="submit"
-											className="focus:bg-destructive/80 focus:text-white"
+											className="hover:bg-red-600 hover:text-primary focus:bg-destructive focus:text-primary"
 											onClick={() => deleteSong(song.id)}
 										>
 											Delete
