@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function ProfilePage() {
 	const { logout, user } = useKindeAuth();
 	return (
-		<div className="flex flex-col gap-y-6 items-center">
+		<div className="flex flex-col gap-y-6 items-center justify-center">
 			<h1 className="text-4xl font-bold">Hi {user?.given_name}</h1>
 			<p>{user?.email}</p>
 			<div className="text-3xl font-bold">

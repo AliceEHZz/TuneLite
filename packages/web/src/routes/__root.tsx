@@ -53,7 +53,7 @@ export const Route = createRootRoute({
 					</div>
 				</div>
 				{/* Right content panel */}
-				<div className="flex flex-col p-20">
+				<div className="flex flex-col p-10">
 					<Outlet />
 				</div>
 			</div>

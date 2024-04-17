@@ -66,9 +66,9 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-[468px] px-2">
-				<h1 className="mb-4 text-2xl font-bold">Add Song.</h1>
-				<div className="flex flex-row justify-between">
+			<div className="mx-auto w-full">
+				<h1 className="mb-4 text-2xl font-bold">Add Song to Playlist</h1>
+				<div className="flex flex-row justify-between space-x-10">
 					{mutation.isError && (
 						<Alert>
 							<AlertCircle className="h-4 w-4" />
@@ -83,14 +83,19 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 							e.stopPropagation();
 							void form.handleSubmit();
 						}}
-						className="flex flex-col gap-y-4"
+						className="flex flex-row flex-wrap gap-x-4 gap-y-4 w-full"
 					>
-						<div>
+						<div className="flex flex-col grow w-full sm:w-1/2 md:w-1/4">
 							<form.Field
 								name="songName"
 								children={(field) => (
 									<>
-										<Label htmlFor={field.name}>Song Name</Label>
+										<Label
+											htmlFor={field.name}
+											className="mb-4 text-md font-medium"
+										>
+											Song Name
+										</Label>
 										<Input
 											id={field.name}
 											name={field.name}
@@ -98,6 +103,7 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 											placeholder="Enter song's name"
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
+											className="w-full"
 										/>
 										{field.state.meta.touchedErrors ? (
 											<em>{field.state.meta.touchedErrors}</em>
@@ -106,12 +112,17 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 								)}
 							/>
 						</div>
-						<div>
+						<div className="flex flex-col w-full sm:w-1/4 md:w-1/4">
 							<form.Field
 								name="artist"
 								children={(field) => (
 									<>
-										<Label htmlFor={field.name}>Artist</Label>
+										<Label
+											htmlFor={field.name}
+											className="mb-4 text-md font-medium"
+										>
+											Artist
+										</Label>
 										<Input
 											id={field.name}
 											name={field.name}
@@ -119,6 +130,7 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 											placeholder="Enter artist"
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
+											className="w-full"
 										/>
 										{field.state.meta.touchedErrors ? (
 											<em>{field.state.meta.touchedErrors}</em>
@@ -127,18 +139,20 @@ export function CreateSongForm({ playlistId }: { playlistId: number }) {
 								)}
 							/>
 						</div>
-						<form.Subscribe
-							selector={(state) => [state.canSubmit, state.isSubmitting]}
-							children={([canSubmit, isSubmitting]) => (
-								<Button
-									type="submit"
-									className="mt-4"
-									disabled={!canSubmit || isSubmitting}
-								>
-									{isSubmitting ? "Submitting" : "Add New Song"}
-								</Button>
-							)}
-						></form.Subscribe>
+						<div className="flex flex-col mt-auto w-full sm:w-1/4 md:w-1/4">
+							<form.Subscribe
+								selector={(state) => [state.canSubmit, state.isSubmitting]}
+								children={([canSubmit, isSubmitting]) => (
+									<Button
+										type="submit"
+										className={`mt-4 w-full hover:bg-green-500 hover:text-primary ${isSubmitting ? "cursor-not-allowed" : ""}`}
+										disabled={!canSubmit || isSubmitting}
+									>
+										{isSubmitting ? "Submitting" : "Add New Song"}
+									</Button>
+								)}
+							></form.Subscribe>
+						</div>
 					</form>
 				</div>
 			</div>

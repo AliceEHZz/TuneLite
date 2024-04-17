@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { SongsFetcher } from "@/components/songs-fetcher";
 import { CreateSongForm } from "@/components/createSong";
+import { Separator } from "@/components/ui/separator";
 
 export const Route = createFileRoute("/_authenticated/playlist/$id")({
 	component: PlaylistComponent,
@@ -48,31 +48,6 @@ function PlaylistComponent() {
 		queryFn: getPlaylist,
 	});
 
-	//handle deleteOnClick
-	const queryClient = useQueryClient();
-	const navigate = useNavigate();
-	const mutation = useMutation({
-		mutationFn: async (id: number) => {
-			const token = await getToken();
-			if (!token) {
-				throw new Error("No token found");
-			}
-			await fetch(import.meta.env.VITE_APP_API_URL + "/playlists/" + id, {
-				method: "DELETE",
-				headers: {
-					Authorization: token,
-					"Content-Type": "application/json",
-				},
-			});
-		},
-	});
-
-	const deletePlaylist = async (id: number) => {
-		await mutation.mutateAsync(id);
-		queryClient.invalidateQueries({ queryKey: ["getPlaylists"] });
-		navigate({ to: "/" });
-	};
-
 	const formatDate = (date: string) => {
 		return date.toString().split("T")[0];
 	};
@@ -82,9 +57,8 @@ function PlaylistComponent() {
 			{error ? (
 				<div className="text-red-400">{`An error has occurred: ${error.message}`}</div>
 			) : data ? (
-				<div className="flex flex-col space-y-4">
-					<div className="max-w-lg mx-auto p-4 bg-gray-800 shadow-md rounded-md text-white">
-						<h1 className="text-3xl font-bold mb-4">{data.playlist.name}</h1>{" "}
+				<div className="flex flex-col space-y-4 w-full self-start items-start content-start">
+					<div className="w-full flex flex-row mx-auto p-4 pb-0 shadow-md rounded-md text-white bg-secondary">
 						<div className="relative h-64 mb-4">
 							<img
 								src={data.playlist.image}
@@ -92,23 +66,19 @@ function PlaylistComponent() {
 								className="object-cover w-full h-full rounded-md"
 							/>
 						</div>
-						<div className="my-2 text-right flex flex-row justify-between">
-							<p className="mb-4">
+						<div className="my-2 flex flex-col justify-between place-content-end ml-auto text-right mr-10">
+							<h1 className="text-6xl font-bold mb-4">{data.playlist.name}</h1>
+							<p className="mb-4 text-xl">
 								Created at: {formatDate(data.playlist.createdAt)}
 							</p>
-							<Button
-								type="submit"
-								className="focus:bg-destructive/80 focus:text-white"
-								onClick={() => deletePlaylist(parseInt(id))}
-							>
-								Delete
-							</Button>
 						</div>
 					</div>
-					<div className="mt-10">
+					<Separator className="text-3xl" />
+					<div className="mt-10 w-full">
 						<CreateSongForm playlistId={parseInt(id)} />
 					</div>
-					<div className="mt-10">
+					<Separator className="mt-10" />
+					<div className="mt-10 w-full">
 						<SongsFetcher playlistId={parseInt(id)} playlistName={data.name} />
 					</div>
 				</div>

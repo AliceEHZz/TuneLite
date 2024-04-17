@@ -20,8 +20,8 @@ type Playlist = {
 
 function CreatePlaylist() {
 	return (
-		<div className="mx-auto max-w-[468px] px-2">
-			<h1 className="mb-4 text-2xl font-bold">Create a New Playlist</h1>
+		<div className="mx-auto max-w-[468px] p-10">
+			<h1 className="mb-10 text-2xl font-bold">Create a New Playlist</h1>
 			<CreatePlaylistForm />
 		</div>
 	);
@@ -118,7 +118,7 @@ function CreatePlaylistForm() {
 	});
 
 	return (
-		<>
+		<div className="">
 			<div className="flex flex-col space-y-4">
 				{mutation.isError && (
 					<Alert>
@@ -208,6 +208,6 @@ function CreatePlaylistForm() {
 					></form.Subscribe>
 				</form>
 			</div>
-		</>
+		</div>
 	);
 }
